@@ -1,26 +1,30 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 type Todo = {
   name: string;
   complete: boolean;
 };
 const serverHost = "http://10.44.22.41:3000";
 const Index = () => {
-  const [todoList, setTodoList] = useState<Todo[]>([
-    { name: "Buy Milk", complete: false },
-    { name: "Buy Eggs", complete: true },
-    { name: "Buy Bread", complete: false },
-  ]);
-  const [newTodo, setNewTodo] = useState("");
-  const addNewTodo = () => {
-    setTodoList((prev) => [...prev, { name: newTodo, complete: false }]);
+  const [todoList, setTodoList] = useState<Todo[]>([]);
+  const [newTodoName, setNewTodoName] = useState("");
+  const addNewTodo = async () => {
+    const newTodo = { name: newTodoName, complete: false };
+    if (todoList) setTodoList((prev: Todo[]) => [...prev, newTodo]);
+    const response = await axios.post(serverHost, newTodo);
+    if (response.status === 201) {
+      console.log("todo added");
+    }
   };
+
   useEffect(() => {
     const getTodos = async () => {
       const response = await axios.get(serverHost);
       const newTodos = response.data;
       setTodoList(newTodos);
     };
+    getTodos();
   }, []);
   return (
     <View style={styles.page}>
@@ -29,8 +33,8 @@ const Index = () => {
         <Text style={styles.label}>New Todo Name:</Text>
         <TextInput
           style={styles.input}
-          value={newTodo}
-          onChangeText={(t) => setNewTodo(t)}
+          value={newTodoName}
+          onChangeText={(t) => setNewTodoName(t)}
         />
         <Pressable style={styles.addButton} onPress={() => addNewTodo()}>
           <Text style={styles.buttonText}>Add Todo</Text>

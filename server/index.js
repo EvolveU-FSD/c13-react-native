@@ -8,12 +8,13 @@ const todos = [
   { name: "Buy Bread", complete: false },
 ];
 app.use(cors());
+app.use(express.json());
 app.get("/", (req, res) => {
   res.json(todos);
 });
-
 app.post("/", (req, res) => {
   const newTodo = req.body;
+  console.log(newTodo, "newTodo");
   todos.push(newTodo);
   res.sendStatus(201);
 });
